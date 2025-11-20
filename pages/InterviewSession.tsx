@@ -30,6 +30,9 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const recognitionRef = useRef<any>(null);
   const timerIntervalRef = useRef<number | null>(null);
+  const sessionIdRef = useRef(
+    `session-${setupData.name}-${setupData.role}`.replace(/\s+/g, '_').toLowerCase()
+  );
 
   useEffect(() => {
     if (status === 'interviewing' && !isPaused) {
@@ -90,6 +93,36 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Auto-save user answer to localStorage after inactivity
+  useEffect(() => {
+    if (status !== 'interviewing') return;
+
+    const key = `parakeet_autosave_${sessionIdRef.current}_${currentQIndex}`;
+    const handler = setTimeout(() => {
+        if (userAnswer && userAnswer.trim() !== '') {
+            localStorage.setItem(key, userAnswer);
+        } else {
+            // If user clears the input, remove the key
+            localStorage.removeItem(key);
+        }
+    }, 1500); // 1.5 seconds of inactivity
+
+    return () => clearTimeout(handler);
+  }, [userAnswer, currentQIndex, status]);
+
+  // Load saved answer from localStorage when question changes
+  useEffect(() => {
+    if (status === 'interviewing') {
+      const key = `parakeet_autosave_${sessionIdRef.current}_${currentQIndex}`;
+      const savedAnswer = localStorage.getItem(key);
+      if (savedAnswer) {
+        setUserAnswer(savedAnswer);
+      } else {
+        setUserAnswer(''); // Clear for new question if no saved answer
+      }
+    }
+  }, [currentQIndex, status]);
+
   const initCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -138,7 +171,12 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
     
     const updatedRecords = [...records, newRecord];
     setRecords(updatedRecords);
-    setUserAnswer('');
+    
+    // Clean up saved answer for this question
+    const key = `parakeet_autosave_${sessionIdRef.current}_${currentQIndex}`;
+    localStorage.removeItem(key);
+    
+    setUserAnswer(''); // Clear text area immediately
 
     if (currentQIndex < questions.length - 1) {
         setCurrentQIndex(prev => prev + 1);
@@ -168,6 +206,14 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
         status: 'Completed',
         records: finalRecords
     };
+    
+    // Final cleanup of all autosaved entries for this session
+    if (questions && questions.length > 0) {
+      for (let i = 0; i < questions.length; i++) {
+        const key = `parakeet_autosave_${sessionIdRef.current}_${i}`;
+        localStorage.removeItem(key);
+      }
+    }
 
     StorageService.saveInterview(session);
     onFinish(session.id);
