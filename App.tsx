@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Landing from './pages/Landing';
 import InterviewSetup from './pages/InterviewSetup';
 import InterviewSessionPage from './pages/InterviewSession';
@@ -12,11 +12,12 @@ import AdminLoginPage from './pages/admin/Login';
 import { Navbar, AdminSidebar } from './components/Layout';
 
 const App: React.FC = () => {
-  const [page, setPage] = useState('landing');
+  // Restore page from session storage to handle reloads
+  const [page, setPage] = useState(() => sessionStorage.getItem('parakeet_current_page') || 'landing');
   const [interviewData, setInterviewData] = useState<any>(null);
   const [completedSessionId, setCompletedSessionId] = useState<string>('');
 
-  // Admin auth state
+  // Admin auth state from localStorage
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => {
     try {
       return localStorage.getItem('parakeet_admin_auth') === 'true';
@@ -24,25 +25,37 @@ const App: React.FC = () => {
       return false;
     }
   });
+  
+  // Centralized effect for handling route protection
+  useEffect(() => {
+    // If trying to access any admin page (except login) while not authenticated, redirect to login
+    if (page.startsWith('admin-') && page !== 'admin-login' && !isAdminAuthenticated) {
+      setPage('admin-login');
+      sessionStorage.setItem('parakeet_current_page', 'admin-login');
+    }
+    // If authenticated user is on login page, redirect to dashboard
+    if (page === 'admin-login' && isAdminAuthenticated) {
+      setPage('admin-dashboard');
+      sessionStorage.setItem('parakeet_current_page', 'admin-dashboard');
+    }
+  }, [page, isAdminAuthenticated]);
 
   const navigate = (p: string) => {
     window.scrollTo(0,0);
-    // If trying to access admin area while logged out, redirect to login
-    if (p.startsWith('admin-') && !isAdminAuthenticated) {
-      setPage('admin-login');
-    } else {
-      setPage(p);
-    }
+    sessionStorage.setItem('parakeet_current_page', p);
+    setPage(p);
   };
   
   const handleAdminLogin = () => {
     localStorage.setItem('parakeet_admin_auth', 'true');
     setIsAdminAuthenticated(true);
+    // After login, redirect to dashboard.
     navigate('admin-dashboard');
   };
 
   const handleAdminLogout = () => {
     localStorage.removeItem('parakeet_admin_auth');
+    sessionStorage.removeItem('parakeet_current_page');
     setIsAdminAuthenticated(false);
     navigate('landing');
   };
@@ -68,8 +81,8 @@ const App: React.FC = () => {
   }
 
   // Protected Admin Routes
-  if (page.startsWith('admin')) {
-    // This is a fallback/security check. The `navigate` function should prevent this.
+  if (page.startsWith('admin-')) {
+    // Fallback security check, though useEffect should handle redirection
     if (!isAdminAuthenticated) {
        return <AdminLoginPage onLoginSuccess={handleAdminLogin} onNavigate={navigate} />;
     }
