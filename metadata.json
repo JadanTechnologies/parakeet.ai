@@ -1,0 +1,8 @@
+{
+  "name": "Parakeet AI Interview Clone",
+  "description": "A full-featured AI interview platform with admin dashboard, utilizing Gemini 2.5 Flash for real-time evaluation and question generation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
