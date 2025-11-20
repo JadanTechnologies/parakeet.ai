@@ -15,6 +15,7 @@ export interface Question {
   text: string;
   category: QuestionCategory;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  language?: string;
 }
 
 export interface Evaluation {
@@ -41,6 +42,7 @@ export interface InterviewSession {
   jobRole: string;
   industry: string;
   mode: InterviewMode;
+  language: string;
   date: string;
   overallScore: number;
   status: 'Completed' | 'Incomplete';

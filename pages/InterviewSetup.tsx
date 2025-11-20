@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { InterviewMode } from '../types';
-import { Briefcase, User, Settings, Play } from 'lucide-react';
+import { Briefcase, User, Settings, Play, Globe } from 'lucide-react';
 
 interface Props {
   onStart: (data: any) => void;
@@ -13,10 +13,11 @@ const InterviewSetup: React.FC<Props> = ({ onStart, onBack }) => {
   const [industry, setIndustry] = useState('Tech');
   const [mode, setMode] = useState<InterviewMode>(InterviewMode.NORMAL);
   const [count, setCount] = useState(3);
+  const [language, setLanguage] = useState('English');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onStart({ name, role, industry, mode, count });
+    onStart({ name, role, industry, mode, count, language });
   };
 
   return (
@@ -67,6 +68,21 @@ const InterviewSetup: React.FC<Props> = ({ onStart, onBack }) => {
                     </select>
                 </div>
             </div>
+            
+            <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-primary" /> Language
+                </label>
+                <select 
+                    value={language} onChange={e => setLanguage(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-primary outline-none bg-white"
+                >
+                    <option>English</option>
+                    <option>Spanish</option>
+                    <option>French</option>
+                </select>
+            </div>
+
 
             <div className="space-y-4">
                 <label className="block text-sm font-medium text-gray-700">Interview Mode</label>

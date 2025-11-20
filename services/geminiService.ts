@@ -13,7 +13,8 @@ export const generateInterviewQuestions = async (
   role: string,
   industry: string,
   mode: InterviewMode,
-  count: number
+  count: number,
+  language: string
 ): Promise<GeneratedQuestionResponse> => {
   const ai = getAiClient();
   
@@ -21,7 +22,7 @@ export const generateInterviewQuestions = async (
   if (mode === InterviewMode.HARD) difficultyPrompt = "very challenging and in-depth";
   if (mode === InterviewMode.STRESS) difficultyPrompt = "intense, pressure-testing, and slightly confrontational";
 
-  const prompt = `Generate ${count} interview questions for a ${role} position in the ${industry} industry. 
+  const prompt = `Generate ${count} interview questions for a ${role} position in the ${industry} industry, in ${language}.
   The tone should be ${difficultyPrompt}. Mix technical and behavioral questions.`;
 
   const schema = {
@@ -73,11 +74,12 @@ export const generateInterviewQuestions = async (
 export const evaluateAnswer = async (
   question: string,
   answer: string,
-  role: string
+  role: string,
+  language: string
 ): Promise<EvaluationResponse> => {
   const ai = getAiClient();
 
-  const prompt = `Evaluate this interview answer for a ${role} role.
+  const prompt = `Evaluate this interview answer for a ${role} role. The interview is in ${language}, so provide all feedback and analysis in ${language}.
   Question: "${question}"
   Candidate Answer: "${answer}"
   

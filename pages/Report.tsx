@@ -65,6 +65,7 @@ const ReportPage: React.FC<Props> = ({ sessionId, onHome }) => {
                 <div className="mt-2 flex gap-2">
                     <span className="px-3 py-1 rounded-full bg-white/10 text-sm">Role Fit: {session.overallScore > 75 ? 'High' : 'Medium'}</span>
                     <span className="px-3 py-1 rounded-full bg-white/10 text-sm">{session.mode} Mode</span>
+                    <span className="px-3 py-1 rounded-full bg-white/10 text-sm">{session.language}</span>
                 </div>
              </div>
           </div>

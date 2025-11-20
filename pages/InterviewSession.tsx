@@ -11,6 +11,7 @@ interface Props {
     mode: InterviewMode;
     count: number;
     name: string;
+    language: string;
   };
   onFinish: (sessionId: string) => void;
 }
@@ -51,7 +52,7 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
     const initSession = async () => {
       setStatus('loading');
       try {
-        const qResponse = await generateInterviewQuestions(setupData.role, setupData.industry, setupData.mode, setupData.count);
+        const qResponse = await generateInterviewQuestions(setupData.role, setupData.industry, setupData.mode, setupData.count, setupData.language);
         setQuestions(qResponse.questions);
         setStatus('interviewing');
         initCamera();
@@ -125,7 +126,7 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
 
     // Evaluate Answer
     const currentQ = questions[currentQIndex];
-    const evaluation = await evaluateAnswer(currentQ.text, userAnswer || "No answer provided.", setupData.role);
+    const evaluation = await evaluateAnswer(currentQ.text, userAnswer || "No answer provided.", setupData.role, setupData.language);
     
     const newRecord: QARecord = {
         questionId: currentQIndex.toString(),
@@ -161,6 +162,7 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
         jobRole: setupData.role,
         industry: setupData.industry,
         mode: setupData.mode,
+        language: setupData.language,
         date: new Date().toISOString(),
         overallScore: Math.round(totalScore),
         status: 'Completed',

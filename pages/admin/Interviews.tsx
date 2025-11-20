@@ -25,6 +25,7 @@ const Interviews: React.FC<Props> = ({ onViewReport }) => {
                 <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Candidate</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Language</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mode</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
@@ -36,6 +37,7 @@ const Interviews: React.FC<Props> = ({ onViewReport }) => {
                     <tr key={interview.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{interview.candidateName}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{interview.jobRole}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{interview.language || 'English'}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{interview.mode}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(interview.date).toLocaleDateString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
