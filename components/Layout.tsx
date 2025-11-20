@@ -27,7 +27,7 @@ export const Navbar: React.FC<{ onNavigate: (page: string) => void }> = ({ onNav
   </nav>
 );
 
-export const AdminSidebar: React.FC<{ currentPage: string, onNavigate: (page: string) => void }> = ({ currentPage, onNavigate }) => {
+export const AdminSidebar: React.FC<{ currentPage: string, onNavigate: (page: string) => void, onLogout: () => void }> = ({ currentPage, onNavigate, onLogout }) => {
   const items = [
     { id: 'admin-dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'admin-questions', label: 'Questions', icon: FileText },
@@ -59,9 +59,9 @@ export const AdminSidebar: React.FC<{ currentPage: string, onNavigate: (page: st
         ))}
       </div>
       <div className="p-4 border-t border-gray-700">
-        <button onClick={() => onNavigate('landing')} className="flex items-center text-gray-400 hover:text-white w-full px-4 py-2">
+        <button onClick={onLogout} className="flex items-center text-gray-400 hover:text-white w-full px-4 py-2 hover:bg-white/5 rounded-lg transition-colors">
           <LogOut className="h-5 w-5 mr-3" />
-          Exit Demo
+          Logout
         </button>
       </div>
     </div>
