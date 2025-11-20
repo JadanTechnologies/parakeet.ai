@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { InterviewMode, EvaluationResponse, GeneratedQuestionResponse } from "../types";
 
 const apiKey = process.env.API_KEY || '';
@@ -24,7 +24,7 @@ export const generateInterviewQuestions = async (
   const prompt = `Generate ${count} interview questions for a ${role} position in the ${industry} industry. 
   The tone should be ${difficultyPrompt}. Mix technical and behavioral questions.`;
 
-  const schema: Schema = {
+  const schema = {
     type: Type.OBJECT,
     properties: {
       questions: {
@@ -83,7 +83,7 @@ export const evaluateAnswer = async (
   
   Rate from 0-100 on criteria. Provide constructive feedback.`;
 
-  const schema: Schema = {
+  const schema = {
     type: Type.OBJECT,
     properties: {
       clarity: { type: Type.NUMBER, description: "0-100 score" },

@@ -4,6 +4,10 @@ import InterviewSetup from './pages/InterviewSetup';
 import InterviewSessionPage from './pages/InterviewSession';
 import ReportPage from './pages/Report';
 import Dashboard from './pages/admin/Dashboard';
+import Questions from './pages/admin/Questions';
+import Users from './pages/admin/Users';
+import Interviews from './pages/admin/Interviews';
+import Settings from './pages/admin/Settings';
 import { Navbar, AdminSidebar } from './components/Layout';
 
 const App: React.FC = () => {
@@ -26,6 +30,11 @@ const App: React.FC = () => {
     navigate('report');
   };
 
+  const viewReport = (id: string) => {
+    setCompletedSessionId(id);
+    navigate('report');
+  }
+
   // Admin Routes
   if (page.startsWith('admin')) {
     return (
@@ -33,10 +42,10 @@ const App: React.FC = () => {
             <AdminSidebar currentPage={page} onNavigate={navigate} />
             <div className="flex-1">
                 {page === 'admin-dashboard' && <Dashboard />}
-                {page === 'admin-questions' && <div className="ml-64 p-8">Questions Manager (Demo Placeholder)</div>}
-                {page === 'admin-users' && <div className="ml-64 p-8">Users Manager (Demo Placeholder)</div>}
-                {page === 'admin-interviews' && <div className="ml-64 p-8">Interviews List (Demo Placeholder)</div>}
-                {page === 'admin-settings' && <div className="ml-64 p-8">Settings (Demo Placeholder)</div>}
+                {page === 'admin-questions' && <Questions />}
+                {page === 'admin-users' && <Users />}
+                {page === 'admin-interviews' && <Interviews onViewReport={viewReport} />}
+                {page === 'admin-settings' && <Settings />}
             </div>
         </div>
     );

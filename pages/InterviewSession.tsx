@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Camera, StopCircle, Send, RefreshCw, Video, VideoOff } from 'lucide-react';
+import { Mic, Camera, StopCircle, Send, RefreshCw, Video, VideoOff, Pause, Play } from 'lucide-react';
 import { generateInterviewQuestions, evaluateAnswer } from '../services/geminiService';
 import { StorageService } from '../services/storageService';
 import { InterviewMode, QARecord, InterviewSession } from '../types';
@@ -24,11 +24,28 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
   const [timer, setTimer] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  // Speech Recognition Setup
   const recognitionRef = useRef<any>(null);
+  const timerIntervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (status === 'interviewing' && !isPaused) {
+      timerIntervalRef.current = window.setInterval(() => {
+        setTimer(t => t + 1);
+      }, 1000);
+    } else {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    }
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, [status, isPaused]);
 
   useEffect(() => {
     const initSession = async () => {
@@ -37,7 +54,6 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
         const qResponse = await generateInterviewQuestions(setupData.role, setupData.industry, setupData.mode, setupData.count);
         setQuestions(qResponse.questions);
         setStatus('interviewing');
-        startTimer();
         initCamera();
         speak(qResponse.questions[0].text);
       } catch (e) {
@@ -83,13 +99,6 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
       console.error("Camera access denied", e);
       setVideoEnabled(false);
     }
-  };
-
-  const startTimer = () => {
-    const interval = setInterval(() => {
-      setTimer(t => t + 1);
-    }, 1000);
-    return () => clearInterval(interval);
   };
 
   const speak = (text: string) => {
@@ -203,8 +212,17 @@ const InterviewSessionPage: React.FC<Props> = ({ setupData, onFinish }) => {
             <h1 className="text-2xl font-bold text-secondary">{setupData.role} Interview</h1>
             <span className="text-sm text-gray-500">{setupData.mode} Mode • {questions.length} Questions</span>
         </div>
-        <div className="bg-white px-4 py-2 rounded-full shadow-sm border font-mono font-medium text-primary">
-            {formatTime(timer)}
+        <div className="flex items-center gap-4">
+          <div className="bg-white px-4 py-2 rounded-full shadow-sm border font-mono font-medium text-primary">
+              {formatTime(timer)}
+          </div>
+          <button 
+            onClick={() => setIsPaused(!isPaused)}
+            className="bg-white p-2 rounded-full shadow-sm border text-secondary hover:bg-gray-100"
+            aria-label={isPaused ? "Resume timer" : "Pause timer"}
+          >
+            {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
+          </button>
         </div>
       </div>
 

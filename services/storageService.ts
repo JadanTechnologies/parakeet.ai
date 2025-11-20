@@ -72,6 +72,22 @@ export const StorageService = {
     return JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
   },
 
+  saveUser: (user: UserProfile) => {
+    const users = StorageService.getUsers();
+    const existingIndex = users.findIndex(u => u.id === user.id);
+    if (existingIndex > -1) {
+      users[existingIndex] = user;
+    } else {
+      users.push({ ...user, id: user.id || `u${Date.now()}` });
+    }
+    localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+  },
+  
+  deleteUser: (id: string) => {
+    const users = StorageService.getUsers().filter(u => u.id !== id);
+    localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+  },
+
   updateUserStats: (session: InterviewSession) => {
     // For demo, just add a dummy user or update existing if we had auth
     // Here we just ensure stats look alive
